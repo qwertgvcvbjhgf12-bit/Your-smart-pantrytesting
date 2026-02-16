@@ -13,186 +13,39 @@
 
 <style>
 :root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#1e1e1e;
-  --accent:#2e7d32;
-  --border:#e0e0e0;
-  --danger:#d32f2f;
+  --bg:#f4f6f8; --card:#ffffff; --text:#1e1e1e;
+  --accent:#2e7d32; --border:#e0e0e0; --danger:#d32f2f;
 }
-.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#ffffff;
-  --accent:#4caf50;
-  --border:#333;
-}
-body{
-  margin:0;
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:background .3s,color .3s;
-}
-header{
-  background:var(--accent);
-  color:white;
-  padding:16px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-.toggle-btn{
-  cursor:pointer;
-  font-size:1.4rem;
-  transition:transform .3s;
-}
-.toggle-btn:hover{
-  transform:scale(1.1);
-}
-.container{
-  display:flex;
-  min-height:100vh;
-  transition:margin-left .3s ease;
-}
-.sidebar{
-  width:260px;
-  background:var(--card);
-  border-right:1px solid var(--border);
-  padding:20px;
-  transition:width .3s ease, opacity .3s ease;
-  overflow:hidden;
-}
-.sidebar.collapsed{
-  width:0;
-  padding:0;
-}
-.sidebar h3{
-  margin-top:0;
-}
-.main{
-  flex:1;
-  padding:30px;
-  display:grid;
-  gap:20px;
-  animation:fadeIn .4s ease;
-}
-.card{
-  background:var(--card);
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.05);
-  transition:transform .2s ease, box-shadow .2s ease;
-  position:relative;
-}
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 12px 25px rgba(0,0,0,0.08);
-}
-button{
-  background:var(--accent);
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:600;
-  transition:opacity .2s ease, transform .1s ease;
-}
-button:hover{
-  opacity:.9;
-}
-button:active{
-  transform:scale(.96);
-}
-input,textarea{
-  width:100%;
-  padding:8px;
-  margin:6px 0;
-  border-radius:8px;
-  border:1px solid var(--border);
-  background:var(--bg);
-  color:var(--text);
-  transition:border .2s ease;
-}
-input:focus, textarea:focus{
-  outline:none;
-  border:1px solid var(--accent);
-}
-.recipe-card{
-  border-left:6px solid var(--accent);
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:10px;
-  background:var(--card);
-  animation:fadeIn .3s ease;
-}
-.missing{
-  color:var(--danger);
-  font-size:0.9rem;
-}
-.available{
-  color:var(--accent);
-  font-weight:600;
-}
-.stats{
-  display:flex;
-  gap:20px;
-  font-size:0.95rem;
-}
-.stat-box{
-  background:var(--card);
-  padding:10px 16px;
-  border-radius:10px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.05);
-}
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(8px);}
-  to{opacity:1; transform:translateY(0);}
-}
-.camera-icon{
-  cursor:pointer;
-  position:absolute;
-  right:80px;
-  top:42px;
-  font-size:1.3rem;
-  color:var(--accent);
-  transition:transform .2s ease;
-}
-.camera-icon:hover{
-  transform:scale(1.2);
-}
-.collapsible{
-  overflow:hidden;
-  transition:height .3s ease, padding .3s ease;
-}
-.collapsedPantry{
-  height:0 !important;
-  padding:0 !important;
-}
-.suggestion-item{
-  padding:6px;
-  cursor:pointer;
-}
-.suggestion-item:hover{
-  background:rgba(0,0,0,0.05);
-}
-@media(max-width:768px){
-  .sidebar{
-    position:absolute;
-    z-index:10;
-    height:100%;
-  }
-  .sidebar.collapsed{
-    width:0;
-    padding:0;
-  }
-}
+.dark{--bg:#121212;--card:#1e1e1e;--text:#ffffff;--accent:#4caf50;--border:#333;}
+body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;}
+header{background:var(--accent);color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+.header-left{display:flex;align-items:center;gap:15px;}
+.toggle-btn{cursor:pointer;font-size:1.4rem;transition:transform .3s;}
+.toggle-btn:hover{transform:scale(1.1);}
+.container{display:flex;min-height:100vh;transition:margin-left .3s ease;}
+.sidebar{width:260px;background:var(--card);border-right:1px solid var(--border);padding:20px;transition:width .3s ease, opacity .3s ease;overflow:hidden;}
+.sidebar.collapsed{width:0;padding:0;}
+.sidebar h3{margin-top:0;}
+.main{flex:1;padding:30px;display:grid;gap:20px;animation:fadeIn .4s ease;}
+.card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.05);transition:transform .2s ease, box-shadow .2s ease;position:relative;}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 25px rgba(0,0,0,0.08);}
+button{background:var(--accent);color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;transition:opacity .2s ease, transform .1s ease;}
+button:hover{opacity:.9;} button:active{transform:scale(.96);}
+input,textarea{width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);transition:border .2s ease;}
+input:focus,textarea:focus{outline:none;border:1px solid var(--accent);}
+.recipe-card{border-left:6px solid var(--accent);padding:12px;margin-bottom:10px;border-radius:10px;background:var(--card);animation:fadeIn .3s ease;}
+.missing{color:var(--danger);font-size:0.9rem;}
+.available{color:var(--accent);font-weight:600;}
+.stats{display:flex;gap:20px;font-size:0.95rem;}
+.stat-box{background:var(--card);padding:10px 16px;border-radius:10px;box-shadow:0 6px 15px rgba(0,0,0,0.05);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.camera-icon{cursor:pointer;position:absolute;right:80px;top:42px;font-size:1.3rem;color:var(--accent);transition:transform .2s ease;}
+.camera-icon:hover{transform:scale(1.2);}
+.collapsible{overflow:hidden;transition:height .3s ease,padding .3s ease;}
+.collapsedPantry{height:0 !important;padding:0 !important;}
+.suggestion-item{padding:6px;cursor:pointer;}
+.suggestion-item:hover{background:rgba(0,0,0,0.05);}
+@media(max-width:768px){.sidebar{position:absolute;z-index:10;height:100%;}.sidebar.collapsed{width:0;padding:0;}}
 </style>
 </head>
 <body>
@@ -202,9 +55,7 @@ input:focus, textarea:focus{
 <span class="toggle-btn" onclick="toggleSidebar()">☰</span>
 <h2>🥫 Smart Pantry Pro</h2>
 </div>
-<div>
-<span style="cursor:pointer" onclick="toggleDark()">🌙</span>
-</div>
+<div><span style="cursor:pointer" onclick="toggleDark()">🌙</span></div>
 </header>
 
 <div class="container">
@@ -235,10 +86,7 @@ input:focus, textarea:focus{
 </div>
 
 <div class="card">
-<h3>
-  Pantry 
-  <span style="cursor:pointer; float:right;" onclick="togglePantry()">▼</span>
-</h3>
+<h3>Pantry <span style="cursor:pointer; float:right;" onclick="togglePantry()">▼</span></h3>
 <div id="pantryList" class="collapsible"></div>
 </div>
 
@@ -263,7 +111,7 @@ input:focus, textarea:focus{
 if(localStorage.getItem("dark")==="true"){document.body.classList.add("dark");}
 function toggleDark(){
  document.body.classList.toggle("dark");
- localStorage.setItem("dark", document.body.classList.contains("dark"));
+ localStorage.setItem("dark",document.body.classList.contains("dark"));
 }
 
 /* SIDEBAR */
@@ -271,27 +119,18 @@ const sidebar=document.getElementById("sidebar");
 if(localStorage.getItem("sidebarCollapsed")==="true"){sidebar.classList.add("collapsed");}
 function toggleSidebar(){
  sidebar.classList.toggle("collapsed");
- localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
+ localStorage.setItem("sidebarCollapsed",sidebar.classList.contains("collapsed"));
 }
 
 /* BASE FOODS */
-const baseFoods=[ "beef","chicken","pork","fish","shrimp","turkey","sausage","bacon","cheese","milk","butter","cream","yogurt","egg","bread","rice","pasta","flour","sugar","salt","pepper","onion","green onion","garlic","tomato","potato","carrot","broccoli","spinach","lettuce","cabbage","mushroom","zucchini","cucumber","corn","peas","beans","lentils","quinoa","barley","tofu","almond","walnut","peanut","hazelnut","cashew","pecan","pine nut","oregano","basil","thyme","rosemary","cilantro","parsley","sage","dill","cumin","paprika","turmeric","curry powder","chili powder","soy sauce","ketchup","mustard","mayonnaise","honey","maple syrup","vanilla","chocolate","cocoa","espresso","tea","coffee","oats","granola","bran","bagel","tortilla","naan","croissant","cracker","pretzel","banana","apple","orange","pear","grape","pineapple","mango","kiwi","blueberry","strawberry","raspberry","blackberry","lemon","lime","avocado"];
+const baseFoods=["beef","chicken","pork","fish","shrimp","turkey","sausage","bacon","cheese","milk","butter","cream","yogurt","egg","bread","rice","pasta","flour","sugar","salt","pepper","onion","green onion","garlic","tomato","potato","carrot","broccoli","spinach","lettuce","cabbage","mushroom","zucchini","cucumber","corn","peas","beans","lentils","quinoa","barley","tofu","almond","walnut","peanut","hazelnut","cashew","pecan","pine nut","oregano","basil","thyme","rosemary","cilantro","parsley","sage","dill","cumin","paprika","turmeric","curry powder","chili powder","soy sauce","ketchup","mustard","mayonnaise","honey","maple syrup","vanilla","chocolate","cocoa","espresso","tea","coffee","oats","granola","bran","bagel","tortilla","naan","croissant","cracker","pretzel","banana","apple","orange","pear","grape","pineapple","mango","kiwi","blueberry","strawberry","raspberry","blackberry","lemon","lime","avocado"];
 
 /* LEVENSHTEIN */
-function levenshtein(a,b){
- const m=[];
- for(let i=0;i<=b.length;i++)m[i]=[i];
- for(let j=0;j<=a.length;j++)m[0][j]=j;
- for(let i=1;i<=b.length;i++){
-  for(let j=1;j<=a.length;j++){
-   m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1);
- }}
- return m[b.length][a.length];
-}
+function levenshtein(a,b){const m=[];for(let i=0;i<=b.length;i++)m[i]=[i];for(let j=0;j<=a.length;j++)m[0][j]=j;for(let i=1;i<=b.length;i++){for(let j=1;j<=a.length;j++){m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1);}}return m[b.length][a.length];}
 
 /* STORAGE */
-let pantry=JSON.parse(localStorage.getItem("pantry"))||{};
-let recipes=JSON.parse(localStorage.getItem("recipes"))||{};
+let pantry=JSON.parse(localStorage.getItem("pantry"))||[];
+let recipes=JSON.parse(localStorage.getItem("recipes"))||[];
 let mistakeLog=JSON.parse(localStorage.getItem("mistakes"))||{};
 
 function save(){
@@ -306,11 +145,8 @@ function normalizeIngredient(input){
  if(original.endsWith("s")) original=original.slice(0,-1);
  if(baseFoods.includes(original)) return original;
  let closest=null,small=999;
- for(const food of baseFoods){
-   let d=levenshtein(original,food);
-   if(d<small){small=d; closest=food;}
- }
- if(small<=2){ mistakeLog[original]=closest; return closest;}
+ for(const food of baseFoods){let d=levenshtein(original,food); if(d<small){small=d;closest=food;}}
+ if(small<=2){mistakeLog[original]=closest; return closest;}
  return original;
 }
 
@@ -320,7 +156,9 @@ document.getElementById("addIngredientBtn").addEventListener("click", ()=>{
  let qty=parseInt(document.getElementById("quantityInput").value);
  if(!input || isNaN(qty) || qty <=0) return;
  let name=normalizeIngredient(input);
- pantry[name]=(pantry[name]||0)+qty;
+ let existing=pantry.find(i=>i.name===name);
+ if(existing) existing.qty+=qty;
+ else pantry.push({name,qty});
  save(); renderAll();
  document.getElementById("ingredientInput").value="";
  document.getElementById("quantityInput").value="";
@@ -332,87 +170,65 @@ document.getElementById("addRecipeBtn").addEventListener("click", ()=>{
  if(!name) return;
  let ingredients=document.getElementById("recipeIngredients").value.split(",").map(i=>normalizeIngredient(i.trim()));
  let instructions=document.getElementById("recipeInstructions").value.trim();
- recipes[name]={ingredients,instructions};
+ let existing=recipes.find(r=>r.name===name);
+ if(existing){existing.ingredients=ingredients; existing.instructions=instructions;}
+ else recipes.push({name,ingredients,instructions});
  save(); renderAll();
  document.getElementById("recipeName").value="";
  document.getElementById("recipeIngredients").value="";
  document.getElementById("recipeInstructions").value="";
 });
 
-/* RENDER */
+/* RENDER FUNCTIONS */
 function renderAll(){renderPantry();renderRecipes();renderAvailable();renderStats();}
 function renderPantry(){
- let div=document.getElementById("pantryList");
- div.innerHTML="";
- for(const i in pantry){
-   const el=document.createElement("div");
-   el.style.animation="fadeIn .3s ease";
-   el.style.display="flex";
-   el.style.justifyContent="space-between";
-   el.style.alignItems="center";
-   const span=document.createElement("span");
-   span.innerText=`${i} (${pantry[i]})`;
-   const btn=document.createElement("button");
-   btn.innerText="X";
-   btn.onclick=()=>{ delete pantry[i]; save(); renderAll(); }
-   el.appendChild(span);
-   el.appendChild(btn);
-   div.appendChild(el);
- }
+ const div=document.getElementById("pantryList"); div.innerHTML="";
+ pantry.forEach((item,idx)=>{
+   const el=document.createElement("div"); el.style.display="flex"; el.style.justifyContent="space-between"; el.style.alignItems="center"; el.style.animation="fadeIn .3s ease";
+   const span=document.createElement("span"); span.innerText=`${item.name} (${item.qty})`;
+   const btn=document.createElement("button"); btn.innerText="X"; btn.addEventListener("click",()=>{ pantry.splice(idx,1); save(); renderAll(); });
+   el.appendChild(span); el.appendChild(btn); div.appendChild(el);
+ });
 }
 function renderRecipes(){
- let div=document.getElementById("recipeList");
- div.innerHTML="";
- for(const r in recipes){
-   const el=document.createElement("div");
-   el.style.animation="fadeIn .3s ease";
-   el.innerHTML=`${r}<hr>`;
-   div.appendChild(el);
- }
+ const div=document.getElementById("recipeList"); div.innerHTML="";
+ recipes.forEach(r=>{
+   const el=document.createElement("div"); el.style.animation="fadeIn .3s ease"; el.innerHTML=`${r.name}<hr>`; div.appendChild(el);
+ });
 }
 function renderAvailable(){
- let div=document.getElementById("availableRecipes");
- div.innerHTML="";
- let matchCount=0,total=Object.keys(recipes).length;
- for(const r in recipes){
-   let missing=recipes[r].ingredients.filter(i=>!pantry[i]);
+ const div=document.getElementById("availableRecipes"); div.innerHTML="";
+ let matchCount=0,total=recipes.length;
+ recipes.forEach(r=>{
+   let missing=r.ingredients.filter(i=>!pantry.find(p=>p.name===i));
    if(missing.length===0) matchCount++;
-   const el=document.createElement("div");
-   el.className="recipe-card";
-   el.innerHTML=`<div class="${missing.length===0?'available':''}">${r}</div>${missing.length>0?`<div class="missing">Missing: ${missing.join(", ")}</div>`:""}`;
+   const el=document.createElement("div"); el.className="recipe-card";
+   el.innerHTML=`<div class="${missing.length===0?'available':''}">${r.name}</div>${missing.length>0?`<div class="missing">Missing: ${missing.join(", ")}</div>`:""}`;
    div.appendChild(el);
- }
+ });
  document.getElementById("matchRate").innerText=total?Math.round((matchCount/total)*100)+"%":"0%";
 }
 function renderStats(){
- document.getElementById("ingredientCount").innerText=Object.keys(pantry).length;
- document.getElementById("recipeCount").innerText=Object.keys(recipes).length;
+ document.getElementById("ingredientCount").innerText=pantry.length;
+ document.getElementById("recipeCount").innerText=recipes.length;
 }
 
 /* COLLAPSIBLE PANTRY */
 let pantryCollapsed=false;
 function togglePantry(){
- const pantryDiv=document.getElementById("pantryList");
- pantryCollapsed=!pantryCollapsed;
- pantryDiv.classList.toggle("collapsedPantry");
+ document.getElementById("pantryList").classList.toggle("collapsedPantry");
 }
 
 /* IMAGE RECOGNITION */
-let model;
-async function loadModel(){ model=await mobilenet.load(); }
-loadModel();
+let model; async function loadModel(){model=await mobilenet.load();} loadModel();
 async function handleImage(event){
  const file=event.target.files[0]; if(!file) return;
  const img=document.createElement("img"); img.src=URL.createObjectURL(file);
  img.onload=async ()=>{
-   const predictions=await model.classify(img);
-   let bestMatch="",bestScore=9999;
+   const predictions=await model.classify(img); let bestMatch="",bestScore=9999;
    for(let i=0;i<Math.min(3,predictions.length);i++){
      let label=predictions[i].className.toLowerCase().split(",")[0].split(" ")[0];
-     for(const food of baseFoods){
-       let d=levenshtein(label,food);
-       if(d<bestScore){bestScore=d; bestMatch=food;}
-     }
+     for(const food of baseFoods){ let d=levenshtein(label,food); if(d<bestScore){bestScore=d; bestMatch=food;}}
    }
    if(bestMatch) document.getElementById("ingredientInput").value=bestMatch;
  }
@@ -421,24 +237,19 @@ async function handleImage(event){
 /* INGREDIENT SUGGESTIONS */
 const ingredientInput=document.getElementById("ingredientInput");
 const suggestionsDiv=document.getElementById("suggestions");
-
 ingredientInput.addEventListener("input",function(){
  const val=this.value.toLowerCase().trim();
  if(!val){suggestionsDiv.style.display="none"; return;}
  const matches=baseFoods.filter(f=>f.startsWith(val)).slice(0,5);
  suggestionsDiv.innerHTML=matches.map(m=>`<div class="suggestion-item">${m}</div>`).join("");
  suggestionsDiv.style.display=matches.length?"block":"none";
- document.querySelectorAll(".suggestion-item").forEach(item=>{
-   item.onclick=()=>{ingredientInput.value=item.innerText; suggestionsDiv.style.display="none";}
- });
+ document.querySelectorAll(".suggestion-item").forEach(item=>{item.onclick=()=>{ingredientInput.value=item.innerText; suggestionsDiv.style.display="none";}});
 });
-
-document.addEventListener("click",function(e){
- if(!ingredientInput.contains(e.target)&&!suggestionsDiv.contains(e.target)){suggestionsDiv.style.display="none";}
-});
+document.addEventListener("click",function(e){if(!ingredientInput.contains(e.target)&&!suggestionsDiv.contains(e.target)){suggestionsDiv.style.display="none";}});
 
 /* INIT */
 renderAll();
 </script>
+
 </body>
 </html>
