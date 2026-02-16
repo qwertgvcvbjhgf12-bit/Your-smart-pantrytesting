@@ -1,327 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Smart Pantry Pro</title>
-<link rel="icon" type="image/png" href="favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
+<title>Smart Pantry</title>
 <style>
-body{
-  font-family:'Inter',sans-serif;
-  background:#f4f6f8;
-  margin:0;
-}
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    background: #f4f4f9;
+    overflow: hidden;
+  }
 
-header{
-  background:#2e7d32;
-  color:white;
-  padding:20px;
-  text-align:center;
-}
+  /* Sidebar */
+  .sidebar {
+    width: 200px;
+    background: #fff;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    overflow-y: auto;
+  }
 
-.container{
-  display:flex;
-}
+  .sidebar h2 {
+    cursor: pointer;
+    margin: 10px 0;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
 
-.sidebar{
-  width:240px;
-  background:#ffffff;
-  padding:20px;
-  border-right:1px solid #ddd;
-  height:calc(100vh - 80px);
-  overflow-y:auto;
-}
+  .sidebarContent {
+    margin-left: 5px;
+    margin-bottom: 10px;
+  }
 
-.main{
-  flex:1;
-  padding:30px;
-}
+  .collapsed {
+    display: none;
+  }
 
-.card{
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.05);
-  margin-bottom:20px;
-}
+  /* Main content */
+  .main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
 
-button{
-  background:#2e7d32;
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:600;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
 
-button:hover{
-  background:#256628;
-}
+  /* Sections */
+  .section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
 
-input, textarea{
-  padding:8px;
-  margin:6px 0;
-  width:100%;
-}
+  .section h2 {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    font-size: 16px;
+  }
 
-.corrected{
-  color:#2e7d32;
-  font-weight:600;
-}
+  .content {
+    margin-top: 10px;
+    display: block;
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+  }
 
-.recipe-possible{
-  border-left:6px solid #2e7d32;
-  padding-left:10px;
-  margin-bottom:10px;
-}
+  /* Inputs */
+  input, textarea, button {
+    padding: 8px;
+    margin: 5px 0;
+    width: 95%;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: #45a049;
+  }
+
+  /* Ingredients / Recipes */
+  .ingredient, .recipe, .recipeItem {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    margin: 3px 0;
+  }
+
+  .remove {
+    color: red;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .instructions {
+    margin-left: 20px;
+    font-style: italic;
+    color: #555;
+    display: none;
+  }
+
+  .quantity {
+    font-weight: bold;
+    margin-left: 5px;
+  }
 </style>
 </head>
 <body>
 
-<header>
-<h1>🥫 Smart Pantry Pro</h1>
-<p>AI-powered pantry & recipe intelligence</p>
-</header>
-
-<div class="container">
-
+<!-- Sidebar -->
 <div class="sidebar">
-<h3>Recipes</h3>
-<div id="recipeList"></div>
-<hr>
-<h4>Common Corrections</h4>
-<div id="mistakes"></div>
+  <h2 onclick="toggleSidebarContent('pantrySidebar')">Pantry ▼</h2>
+  <div id="pantrySidebar" class="sidebarContent"></div>
+
+  <h2 onclick="toggleSidebarContent('recipesSidebar')">Recipes ▼</h2>
+  <div id="recipesSidebar" class="sidebarContent"></div>
 </div>
 
+<!-- Main content -->
 <div class="main">
+  <h1>Smart Pantry</h1>
 
-<div class="card">
-<h3>Add Ingredient</h3>
-<input id="ingredientInput" placeholder="e.g. 2 green onions chopped">
-<input id="quantityInput" type="number" placeholder="Quantity">
-<button onclick="addIngredient()">Add</button>
-<div id="correctionNotice"></div>
-</div>
+  <div class="section">
+    <h2 onclick="toggleSection('ingredientSection')">Add Ingredient ▼</h2>
+    <div class="content" id="ingredientSection">
+      <input type="text" id="ingredientInput" placeholder="Ingredient name">
+      <input type="text" id="ingredientQty" placeholder="Quantity (e.g., 2 cups, 1 loaf)">
+      <button onclick="addIngredient()">Add</button>
+    </div>
+  </div>
 
-<div class="card">
-<h3>Pantry</h3>
-<div id="pantryList"></div>
-</div>
+  <!-- Pantry display in main content -->
+  <div class="section">
+    <h2 onclick="toggleSection('pantrySection')">Pantry ▼</h2>
+    <div class="content" id="pantrySection">
+      <div id="ingredientList"></div>
+    </div>
+  </div>
 
-<div class="card">
-<h3>Add Recipe</h3>
-<input id="recipeName" placeholder="Recipe name">
-<textarea id="recipeIngredients" placeholder="Ingredients separated by comma"></textarea>
-<textarea id="recipeInstructions" placeholder="Instructions"></textarea>
-<button onclick="addRecipe()">Add Recipe</button>
-</div>
+  <div class="section">
+    <h2 onclick="toggleSection('addRecipeSection')">Add Recipe ▼</h2>
+    <div class="content" id="addRecipeSection">
+      <input type="text" id="recipeName" placeholder="Recipe name">
+      <input type="text" id="recipeIngredients" placeholder="Ingredients (comma-separated, e.g., cheddar:1 cup, milk:2 cups)">
+      <textarea id="recipeInstructions" placeholder="Instructions"></textarea>
+      <button onclick="addRecipe()">Add Recipe</button>
+    </div>
+  </div>
 
-<div class="card">
-<h3>Recipes You Can Make</h3>
-<div id="availableRecipes"></div>
-</div>
-
-</div>
+  <div class="section">
+    <h2 onclick="toggleSection('recipeSuggestions')">Recipe Suggestions ▼</h2>
+    <div class="content" id="recipeSuggestions">
+      <div id="recipeList"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-
-// ===== BASE FOOD DATABASE (~100+) =====
-const baseFoods = [
-"beef","chicken","pork","fish","shrimp","turkey","sausage","bacon",
-"cheese","milk","butter","cream","yogurt","egg",
-"bread","rice","pasta","flour","sugar","salt","pepper",
-"onion","green onion","garlic","tomato","potato","carrot",
-"broccoli","spinach","lettuce","cabbage","mushroom",
-"zucchini","cucumber","pepper","corn","peas","green beans",
-"asparagus","cauliflower","eggplant","radish","beet",
-"pumpkin","squash","apple","banana","orange","strawberry",
-"blueberry","raspberry","pineapple","mango","grape","pear",
-"lemon","lime","avocado","cilantro","parsley","basil",
-"oregano","thyme","rosemary","cumin","paprika",
-"chili powder","soy sauce","ketchup","mustard","mayonnaise",
-"honey","maple syrup","oats","almond","walnut","peanut",
-"chocolate","vanilla","baking soda","baking powder",
-"lentils","quinoa","barley","tofu","beans",
-"black beans","kidney beans","pinto beans","hazelnut"
-];
-
-// ===== SPELL CORRECTION =====
-function levenshtein(a,b){
- const matrix=[];
- for(let i=0;i<=b.length;i++) matrix[i]=[i];
- for(let j=0;j<=a.length;j++) matrix[0][j]=j;
- for(let i=1;i<=b.length;i++){
-  for(let j=1;j<=a.length;j++){
-   matrix[i][j]=b.charAt(i-1)===a.charAt(j-1)
-   ?matrix[i-1][j-1]
-   :Math.min(
-     matrix[i-1][j-1]+1,
-     matrix[i][j-1]+1,
-     matrix[i-1][j]+1
-   );
-  }
- }
- return matrix[b.length][a.length];
+// Collapsible sections
+function toggleSection(id){
+  const sec=document.getElementById(id);
+  sec.style.display=(sec.style.display==="none"?"block":"none");
+}
+function toggleSidebarContent(id){
+  const sec=document.getElementById(id);
+  sec.style.display=(sec.style.display==="none"?"block":"none");
 }
 
-// ===== DATA STORAGE =====
-let pantry=JSON.parse(localStorage.getItem("pantry"))||{};
-let recipes=JSON.parse(localStorage.getItem("recipes"))||[];
-let mistakeLog=JSON.parse(localStorage.getItem("mistakes"))||{};
+// --- Pantry & Recipes ---
+let pantry = JSON.parse(localStorage.getItem('pantry')) || [];
+let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
 
-function save(){
- localStorage.setItem("pantry",JSON.stringify(pantry));
- localStorage.setItem("recipes",JSON.stringify(recipes));
- localStorage.setItem("mistakes",JSON.stringify(mistakeLog));
+// --- AI / Spell check ---
+function normalizeIngredient(name){
+  name=name.toLowerCase().trim();
+  const groups={
+    "cheddar":["cheddar","chease","chedar","cheese","sharp cheddar"],
+    "bread":["bread","bred","loaf"],
+    "eggs":["egg","eggs"],
+    "milk":["milk","mylk"],
+    "butter":["butter","buttr"],
+    "pasta":["pasta","spaghetti","macaroni"]
+  };
+  for(const k in groups) if(groups[k].some(a=>name.includes(a))) return k;
+  return name;
 }
 
-// ===== NORMALIZATION ENGINE =====
-function normalizeIngredient(input){
- let original=input.toLowerCase().trim();
+// --- Quantities ---
+function parseQuantity(qty){ const m=qty.trim().match(/^(\d+)\s*(.+)$/); return m?{amount:parseInt(m[1]),unit:m[2].toLowerCase()}:{amount:1,unit:qty}; }
+function combineQuantities(o,n){ const p1=parseQuantity(o), p2=parseQuantity(n); return p1.unit===p2.unit?`${p1.amount+p2.amount} ${p1.unit}`:`${o} + ${n}`; }
 
- // remove quantity words & descriptors
- original=original.replace(/\d+/g,"");
- original=original.replace(/chopped|sliced|diced|fresh|large|small/g,"").trim();
-
- // plural handling
- if(original.endsWith("es")) original=original.slice(0,-2);
- if(original.endsWith("s")) original=original.slice(0,-1);
-
- // exact
- if(baseFoods.includes(original)) return {final:original,changed:false};
-
- // partial match
- for(const food of baseFoods){
-   if(original.includes(food)){
-     logMistake(original,food);
-     return {final:food,changed:true};
-   }
- }
-
- // fuzzy match
- let closest=null;
- let smallest=999;
- for(const food of baseFoods){
-   let dist=levenshtein(original,food);
-   if(dist<smallest){
-     smallest=dist;
-     closest=food;
-   }
- }
-
- if(smallest<=2){
-   logMistake(original,closest);
-   return {final:closest,changed:true};
- }
-
- return {final:original,changed:false};
-}
-
-// ===== MISTAKE TRACKING =====
-function logMistake(from,to){
- if(from===to) return;
- if(!mistakeLog[from]) mistakeLog[from]=to;
-}
-
-// ===== ADD INGREDIENT =====
+// --- Pantry ---
 function addIngredient(){
- let input=document.getElementById("ingredientInput").value;
- let qty=parseInt(document.getElementById("quantityInput").value);
- if(!input||!qty) return;
-
- let result=normalizeIngredient(input);
-
- if(result.changed){
-   if(!confirm(`Did you mean "${result.final}" instead of "${input}"?`)){
-     return;
-   }
- }
-
- if(pantry[result.final]){
-   pantry[result.final]+=qty;
- }else{
-   pantry[result.final]=qty;
- }
-
- document.getElementById("correctionNotice").innerHTML =
- result.changed?`Saved as <span class="corrected">${result.final}</span>`:"";
-
- save();
- renderAll();
+  const name=normalizeIngredient(document.getElementById("ingredientInput").value);
+  const qty=document.getElementById("ingredientQty").value.trim()||"1 unit";
+  if(!name) return;
+  const existing=pantry.find(i=>i.name===name);
+  if(existing) existing.qty=combineQuantities(existing.qty,qty);
+  else pantry.push({name,qty});
+  savePantry(); 
+  document.getElementById("ingredientInput").value=""; 
+  document.getElementById("ingredientQty").value="";
+  updatePantry(); 
+  updatePantrySidebar(); 
+  updateRecipes(); 
+  updateSidebarList();
+}
+function removeIngredient(name){ 
+  pantry=pantry.filter(i=>i.name!==name); 
+  savePantry(); 
+  updatePantry(); 
+  updatePantrySidebar(); 
+  updateRecipes(); 
+}
+function updatePantry(){
+  const list=document.getElementById("ingredientList"); 
+  list.innerHTML="";
+  pantry.forEach(item=>{
+    const d=document.createElement("div"); 
+    d.className="ingredient"; 
+    d.innerHTML=`<span>${item.name} <span class="quantity">(${item.qty})</span></span>`; 
+    const r=document.createElement("span"); 
+    r.className="remove"; 
+    r.textContent="✖"; 
+    r.onclick=()=>removeIngredient(item.name); 
+    d.appendChild(r); 
+    list.appendChild(d); 
+  });
+}
+function updatePantrySidebar(){
+  const list=document.getElementById("pantrySidebar"); 
+  list.innerHTML="";
+  pantry.forEach(item=>{
+    const d=document.createElement("div"); 
+    d.className="ingredient"; 
+    d.textContent=`${item.name} (${item.qty})`; 
+    list.appendChild(d);
+  });
 }
 
-// ===== ADD RECIPE =====
+// --- Recipes ---
 function addRecipe(){
- let name=document.getElementById("recipeName").value;
- let ingredients=document.getElementById("recipeIngredients").value.split(",");
- let instructions=document.getElementById("recipeInstructions").value;
-
- ingredients=ingredients.map(i=>normalizeIngredient(i.trim()).final);
-
- recipes.push({name,ingredients,instructions});
- save();
- renderAll();
+  const name=document.getElementById("recipeName").value.trim();
+  const ingredientsRaw=document.getElementById("recipeIngredients").value.split(",");
+  const instructions=document.getElementById("recipeInstructions").value.trim();
+  if(!name || ingredientsRaw.length===0) return;
+  const ingredients=ingredientsRaw.map(i=>{let p=i.split(":"); return {name:normalizeIngredient(p[0]), qty:p[1]?p[1].trim():"1 unit"};});
+  recipes.push({name,ingredients,instructions});
+  saveRecipes(); 
+  document.getElementById("recipeName").value=""; 
+  document.getElementById("recipeIngredients").value=""; 
+  document.getElementById("recipeInstructions").value="";
+  updateRecipes(); 
+  updateSidebarList();
+}
+function deleteRecipe(index){ 
+  recipes.splice(index,1); 
+  saveRecipes(); 
+  updateRecipes(); 
+  updateSidebarList();
+}
+function updateRecipes(){
+  const list=document.getElementById("recipeList"); 
+  list.innerHTML="";
+  const sorted=recipes.slice().sort((a,b)=> (b.ingredients.every(i=>pantry.find(p=>p.name===i.name))?1:0)-(a.ingredients.every(i=>pantry.find(p=>p.name===i.name))?1:0));
+  sorted.forEach(recipe=>{
+    const missing=recipe.ingredients.filter(i=>!pantry.find(p=>p.name===i.name)); 
+    const div=document.createElement("div"); 
+    div.className="recipe"; 
+    div.textContent=recipe.name+(missing.length===0?" ✅ You have all ingredients!":" ❌ Missing: "+missing.map(m=>m.name).join(", ")); 
+    const instr=document.createElement("div"); 
+    instr.className="instructions"; 
+    instr.innerHTML=recipe.ingredients.map(i=>`${i.name} (${i.qty})`).join(",")+"<br><br>"+(recipe.instructions||"No instructions added."); 
+    div.onclick=()=>{instr.style.display=instr.style.display==="none"?"block":"none";}; 
+    list.appendChild(div); 
+    list.appendChild(instr);
+  });
+}
+function updateSidebarList(){
+  const s=document.getElementById("recipesSidebar"); 
+  s.innerHTML=""; 
+  recipes.forEach((r,i)=>{
+    const d=document.createElement("div"); 
+    d.className="recipeItem"; 
+    d.textContent=r.name; 
+    const rem=document.createElement("span"); 
+    rem.className="remove"; 
+    rem.textContent="✖"; 
+    rem.onclick=()=>deleteRecipe(i); 
+    d.appendChild(rem); 
+    s.appendChild(d);
+  });
 }
 
-// ===== RENDERING =====
-function renderAll(){
- renderPantry();
- renderRecipes();
- renderAvailable();
- renderMistakes();
-}
+// Local storage
+function savePantry(){ localStorage.setItem('pantry',JSON.stringify(pantry)); }
+function saveRecipes(){ localStorage.setItem('recipes',JSON.stringify(recipes)); }
 
-function renderPantry(){
- let div=document.getElementById("pantryList");
- div.innerHTML="";
- for(const item in pantry){
-   div.innerHTML+=`${item}: ${pantry[item]}<br>`;
- }
-}
-
-function renderRecipes(){
- let div=document.getElementById("recipeList");
- div.innerHTML="";
- recipes.forEach((r,i)=>{
-   div.innerHTML+=`<div onclick="viewRecipe(${i})">${r.name}</div><hr>`;
- });
-}
-
-function renderAvailable(){
- let div=document.getElementById("availableRecipes");
- div.innerHTML="";
- recipes.forEach(r=>{
-   let possible=r.ingredients.every(i=>pantry[i]>0);
-   if(possible){
-     div.innerHTML+=`<div class="recipe-possible">${r.name}</div>`;
-   }
- });
-}
-
-function renderMistakes(){
- let div=document.getElementById("mistakes");
- div.innerHTML="";
- for(const m in mistakeLog){
-   div.innerHTML+=`${m} → ${mistakeLog[m]}<br>`;
- }
-}
-
-function viewRecipe(i){
- alert(
-   recipes[i].name+
-   "\n\nIngredients:\n"+
-   recipes[i].ingredients.join(", ")+
-   "\n\nInstructions:\n"+
-   recipes[i].instructions
- );
-}
-
-renderAll();
+// Init
+updatePantry(); updatePantrySidebar(); updateRecipes(); updateSidebarList();
 
 </script>
 </body>
 </html>
+
 
