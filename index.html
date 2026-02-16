@@ -2,221 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Pantry Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Smart Pantry</title>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.9.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 <style>
-:root{--bg:#f4f6f8;--card:#ffffff;--text:#1e1e1e;--accent:#2e7d32;--border:#e0e0e0;--danger:#d32f2f;}
-.dark{--bg:#121212;--card:#1e1e1e;--text:#ffffff;--accent:#4caf50;--border:#333;}
-body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;}
-header{background:var(--accent);color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
-.toggle-btn{cursor:pointer;font-size:1.4rem;transition:transform .3s;} .toggle-btn:hover{transform:scale(1.1);}
-.container{display:flex;min-height:100vh;transition:margin-left .3s ease;}
-.sidebar{width:260px;background:var(--card);border-right:1px solid var(--border);padding:20px;overflow:hidden;}
-.sidebar.collapsed{width:0;padding:0;}
-.main{flex:1;padding:30px;display:grid;gap:20px;}
-.card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.05);position:relative;}
-button{background:var(--accent);color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;}
-input,textarea{width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid var(--border);}
-.recipe-card{border-left:6px solid var(--accent);padding:12px;margin-bottom:10px;border-radius:10px;background:var(--card);}
-.missing{color:var(--danger);font-size:0.9rem;}
-.available{color:var(--accent);font-weight:600;}
-.stats{display:flex;gap:20px;font-size:0.95rem;}
-.stat-box{background:var(--card);padding:10px 16px;border-radius:10px;}
-.collapsible{overflow:hidden;transition:height .3s ease,padding .3s ease;}
-.collapsedPantry{height:0 !important;padding:0 !important;}
-.suggestion-item{padding:6px;cursor:pointer;}
-.suggestion-item:hover{background:rgba(0,0,0,0.05);}
-.camera-icon{cursor:pointer;position:absolute;right:80px;top:42px;font-size:1.3rem;color:var(--accent);}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  background: #f4f4f9;
+  overflow: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+/* Dark mode */
+body.dark {
+  background: #121212;
+  color: #fff;
+}
+/* Sidebar */
+.sidebar { width: 200px; background: #fff; border-right: 1px solid #ccc; display: flex; flex-direction: column; padding: 10px; overflow-y: auto; transition: background 0.3s, color 0.3s; }
+body.dark .sidebar { background: #1e1e1e; color: #fff; border-color: #333; }
+.sidebar h2 { cursor: pointer; margin: 10px 0; font-size: 16px; display: flex; justify-content: space-between; }
+.sidebarContent { margin-left: 5px; margin-bottom: 10px; }
+.collapsed { display: none; }
+/* Main content */
+.main { flex: 1; padding: 20px; overflow-y: auto; transition: background 0.3s, color 0.3s; }
+body.dark .main { background: #121212; color: #fff; }
+h1 { text-align: center; margin-bottom: 20px; color: #333; }
+body.dark h1 { color: #fff; }
+/* Sections */
+.section { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, color 0.3s; }
+body.dark .section { background: #1e1e1e; color: #fff; box-shadow: 0 2px 5px rgba(255,255,255,0.05); }
+.section h2 { cursor: pointer; display: flex; justify-content: space-between; margin: 0; font-size: 16px; }
+.content { margin-top: 10px; display: block; transition: max-height 0.3s ease; overflow: hidden; }
+/* Inputs */
+input, textarea, button { padding: 8px; margin: 5px 0; width: 95%; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
+body.dark input, body.dark textarea { background: #2c2c2c; color: #fff; border-color: #555; }
+button { cursor: pointer; background: #4CAF50; color: white; border: none; transition: 0.2s; }
+button:hover { background: #45a049; }
+/* Ingredients / Recipes */
+.ingredient, .recipe, .recipeItem { padding: 5px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; margin: 3px 0; }
+body.dark .ingredient, body.dark .recipe, body.dark .recipeItem { border-color: #555; }
+.remove { color: red; cursor: pointer; margin-left: 10px; }
+.instructions { margin-left: 20px; font-style: italic; color: #555; display: none; }
+body.dark .instructions { color: #aaa; }
+.quantity { font-weight: bold; margin-left: 5px; }
+.camera-icon { cursor: pointer; margin-left: 5px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div style="display:flex;align-items:center;gap:15px;">
-    <span class="toggle-btn" onclick="toggleSidebar()">☰</span>
-    <h2>🥫 Smart Pantry Pro</h2>
-  </div>
-  <div><span style="cursor:pointer" onclick="toggleDark()">🌙</span></div>
-</header>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2 onclick="toggleSidebarContent('pantrySidebar')">Pantry ▼</h2>
+  <div id="pantrySidebar" class="sidebarContent"></div>
+  <h2 onclick="toggleSidebarContent('recipesSidebar')">Recipes ▼</h2>
+  <div id="recipesSidebar" class="sidebarContent"></div>
+</div>
 
-<div class="container">
-  <div id="sidebar" class="sidebar">
-    <h3>Recipes</h3>
-    <div id="recipeList"></div>
-    <hr>
-  </div>
+<!-- Main content -->
+<div class="main">
+  <h1>Smart Pantry <button onclick="toggleDarkMode()">🌙</button></h1>
 
-  <div class="main">
-    <div class="stats">
-      <div class="stat-box">Ingredients: <span id="ingredientCount">0</span></div>
-      <div class="stat-box">Recipes: <span id="recipeCount">0</span></div>
-      <div class="stat-box">Match Rate: <span id="matchRate">0%</span></div>
-    </div>
-
-    <!-- Add Ingredient -->
-    <div class="card">
-      <h3>Add Ingredient</h3>
-      <div style="position:relative;">
-        <input id="ingredientInput" placeholder="e.g. 2 chopped green onions">
-        <span class="camera-icon" onclick="document.getElementById('imageUpload').click()">📷</span>
-        <div id="suggestions" style="position:absolute;top:38px;left:0;right:0;background:var(--card);border:1px solid #ccc;display:none;max-height:120px;overflow-y:auto;"></div>
-      </div>
-      <input type="number" id="quantityInput" placeholder="Quantity" min="1">
-      <button id="addIngredientBtn">Add</button>
+  <div class="section">
+    <h2 onclick="toggleSection('ingredientSection')">Add Ingredient ▼</h2>
+    <div class="content" id="ingredientSection">
+      <input type="text" id="ingredientInput" placeholder="Ingredient name">
+      <input type="text" id="ingredientQty" placeholder="Quantity (e.g., 2 cups, 1 loaf)">
+      <span class="camera-icon" onclick="document.getElementById('imageUpload').click()">📷</span>
       <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="handleImage(event)">
+      <button onclick="addIngredient()">Add</button>
     </div>
+  </div>
 
-    <!-- Pantry -->
-    <div class="card">
-      <h3>Pantry <span style="cursor:pointer; float:right;" onclick="togglePantry()">▼</span></h3>
-      <div id="pantryList" class="collapsible"></div>
-    </div>
+  <div class="section">
+    <h2 onclick="toggleSection('pantrySection')">Pantry ▼</h2>
+    <div class="content" id="pantrySection"><div id="ingredientList"></div></div>
+  </div>
 
-    <!-- Add Recipe -->
-    <div class="card">
-      <h3>Add Recipe</h3>
-      <input id="recipeName" placeholder="Recipe name">
-      <textarea id="recipeIngredients" placeholder="Ingredients separated by comma"></textarea>
+  <div class="section">
+    <h2 onclick="toggleSection('addRecipeSection')">Add Recipe ▼</h2>
+    <div class="content" id="addRecipeSection">
+      <input type="text" id="recipeName" placeholder="Recipe name">
+      <input type="text" id="recipeIngredients" placeholder="Ingredients (comma-separated)">
       <textarea id="recipeInstructions" placeholder="Instructions"></textarea>
-      <button id="addRecipeBtn">Add Recipe</button>
+      <button onclick="addRecipe()">Add Recipe</button>
     </div>
+  </div>
 
-    <!-- Recipe Suggestions -->
-    <div class="card">
-      <h3>Recipe Suggestions</h3>
-      <div id="availableRecipes"></div>
-    </div>
+  <div class="section">
+    <h2 onclick="toggleSection('recipeSuggestions')">Recipe Suggestions ▼</h2>
+    <div class="content" id="recipeSuggestions"><div id="recipeList"></div></div>
   </div>
 </div>
 
 <script>
-// Dark mode
+// Dark Mode
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
 if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
-function toggleDark(){document.body.classList.toggle("dark"); localStorage.setItem("dark",document.body.classList.contains("dark"));}
 
-// Sidebar
-const sidebar=document.getElementById("sidebar");
-if(localStorage.getItem("sidebarCollapsed")==="true") sidebar.classList.add("collapsed");
-function toggleSidebar(){sidebar.classList.toggle("collapsed"); localStorage.setItem("sidebarCollapsed",sidebar.classList.contains("collapsed"));}
+// Collapsible sections
+function toggleSection(id){ const sec=document.getElementById(id); sec.style.display=(sec.style.display==="none"?"block":"none"); }
+function toggleSidebarContent(id){ const sec=document.getElementById(id); sec.style.display=(sec.style.display==="none"?"block":"none"); }
 
-// Base foods
-const baseFoods=["beef","chicken","pork","fish","shrimp","turkey","sausage","bacon","cheese","milk","butter","cream","yogurt","egg","bread","rice","pasta","flour","sugar","salt","pepper","onion","green onion","garlic","tomato","potato","carrot","broccoli","spinach","lettuce","cabbage","mushroom","zucchini","cucumber","corn","peas","beans","lentils","quinoa","barley","tofu","almond","walnut","peanut","hazelnut","cashew","pecan","pine nut","oregano","basil","thyme","rosemary","cilantro","parsley","sage","dill","cumin","paprika","turmeric","curry powder","chili powder","soy sauce","ketchup","mustard","mayonnaise","honey","maple syrup","vanilla","chocolate","cocoa","espresso","tea","coffee","oats","granola","bran","bagel","tortilla","naan","croissant","cracker","pretzel","banana","apple","orange","pear","grape","pineapple","mango","kiwi","blueberry","strawberry","raspberry","blackberry","lemon","lime","avocado"];
+// Pantry & Recipes
+let pantry = JSON.parse(localStorage.getItem('pantry')) || [];
+let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+function savePantry(){ localStorage.setItem('pantry', JSON.stringify(pantry)); }
+function saveRecipes(){ localStorage.setItem('recipes', JSON.stringify(recipes)); }
 
-// Levenshtein
-function levenshtein(a,b){const m=[];for(let i=0;i<=b.length;i++) m[i]=[i]; for(let j=0;j<=a.length;j++) m[0][j]=j; for(let i=1;i<=b.length;i++){for(let j=1;j<=a.length;j++){m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1);}} return m[b.length][a.length];}
+// Ingredient functions
+function normalizeIngredient(name){ return name.toLowerCase().trim(); }
+function addIngredient(){
+  const name = normalizeIngredient(document.getElementById("ingredientInput").value);
+  const qty = document.getElementById("ingredientQty").value || "1 unit";
+  if(!name) return;
+  const existing = pantry.find(i=>i.name===name);
+  if(existing) existing.qty = qty; else pantry.push({name,qty});
+  savePantry(); updatePantry(); updatePantrySidebar();
+  document.getElementById("ingredientInput").value=""; document.getElementById("ingredientQty").value="";
+}
+function removeIngredient(name){ pantry = pantry.filter(i=>i.name!==name); savePantry(); updatePantry(); updatePantrySidebar(); }
 
-// Storage
-let pantry=JSON.parse(localStorage.getItem("pantry"))||[];
-let recipes=JSON.parse(localStorage.getItem("recipes"))||[];
-let mistakes=JSON.parse(localStorage.getItem("mistakes"))||{};
-function save(){localStorage.setItem("pantry",JSON.stringify(pantry));localStorage.setItem("recipes",JSON.stringify(recipes));localStorage.setItem("mistakes",JSON.stringify(mistakes));}
-
-// Normalize
-function normalizeIngredient(input){
- let original=input.toLowerCase().replace(/\d+/g,"").replace(/chopped|fresh|large|small|diced|sliced/g,"").trim();
- if(original.endsWith("s")) original=original.slice(0,-1);
- if(baseFoods.includes(original)) return original;
- let closest=null,small=999;
- for(const food of baseFoods){let d=levenshtein(original,food);if(d<small){small=d;closest=food;}}
- if(small<=2){mistakes[original]=closest;return closest;}
- return original;
+function updatePantry(){
+  const list=document.getElementById("ingredientList"); list.innerHTML="";
+  pantry.forEach(item=>{
+    const d=document.createElement("div"); d.className="ingredient";
+    d.innerHTML=`<span>${item.name} <span class="quantity">(${item.qty})</span></span>`;
+    const r=document.createElement("span"); r.className="remove"; r.textContent="✖"; r.onclick=()=>removeIngredient(item.name);
+    d.appendChild(r); list.appendChild(d);
+  });
+}
+function updatePantrySidebar(){
+  const list=document.getElementById("pantrySidebar"); list.innerHTML="";
+  pantry.forEach(item=>{
+    const d=document.createElement("div"); d.className="ingredient"; d.textContent=`${item.name} (${item.qty})`; list.appendChild(d);
+  });
 }
 
-// Add ingredient
-document.getElementById("addIngredientBtn").addEventListener("click",()=>{
- let input=document.getElementById("ingredientInput").value.trim();
- let qty=parseInt(document.getElementById("quantityInput").value);
- if(!input || isNaN(qty) || qty<=0) return;
- let name=normalizeIngredient(input);
- let existing=pantry.find(i=>i.name===name);
- if(existing) existing.qty+=qty;
- else pantry.push({name,qty});
- save(); renderAll();
- document.getElementById("ingredientInput").value=""; document.getElementById("quantityInput").value="";
-});
-
-// Add recipe
-document.getElementById("addRecipeBtn").addEventListener("click",()=>{
- let name=document.getElementById("recipeName").value.trim();
- if(!name) return;
- let ingredients=document.getElementById("recipeIngredients").value.split(",").map(i=>normalizeIngredient(i.trim()));
- let instructions=document.getElementById("recipeInstructions").value.trim();
- let existing=recipes.find(r=>r.name===name);
- if(existing){existing.ingredients=ingredients; existing.instructions=instructions;} 
- else recipes.push({name,ingredients,instructions});
- save(); renderAll();
- document.getElementById("recipeName").value=""; document.getElementById("recipeIngredients").value=""; document.getElementById("recipeInstructions").value="";
-});
-
-// Render
-function renderAll(){renderPantry(); renderRecipes(); renderAvailable(); renderStats();}
-function renderPantry(){
- const div=document.getElementById("pantryList"); div.innerHTML="";
- pantry.forEach((item,idx)=>{
-   const el=document.createElement("div");
-   el.style.display="flex"; el.style.justifyContent="space-between"; el.style.alignItems="center";
-   const span=document.createElement("span"); span.innerText=`${item.name} (${item.qty})`;
-   const btn=document.createElement("button"); btn.innerText="X"; btn.addEventListener("click",()=>{pantry.splice(idx,1);save();renderAll();});
-   el.appendChild(span); el.appendChild(btn); div.appendChild(el);
- });
+// Recipes
+function addRecipe(){
+  const name=document.getElementById("recipeName").value.trim();
+  const ingredients=document.getElementById("recipeIngredients").value.split(",").map(i=>({name:normalizeIngredient(i.trim()),qty:"1 unit"}));
+  const instructions=document.getElementById("recipeInstructions").value.trim();
+  if(!name) return;
+  recipes.push({name,ingredients,instructions});
+  saveRecipes(); updateRecipes(); updateSidebarRecipes();
+  document.getElementById("recipeName").value=""; document.getElementById("recipeIngredients").value=""; document.getElementById("recipeInstructions").value="";
 }
-function renderRecipes(){
- const div=document.getElementById("recipeList"); div.innerHTML="";
- recipes.forEach(r=>{const el=document.createElement("div"); el.innerText=r.name; div.appendChild(el);});
+function deleteRecipe(index){ recipes.splice(index,1); saveRecipes(); updateRecipes(); updateSidebarRecipes(); }
+function updateRecipes(){
+  const list=document.getElementById("recipeList"); list.innerHTML="";
+  recipes.forEach(recipe=>{
+    const missing = recipe.ingredients.filter(i=>!pantry.find(p=>p.name===i.name));
+    const div=document.createElement("div"); div.className="recipe";
+    div.textContent = recipe.name + (missing.length===0?" ✅":" ❌ Missing: "+missing.map(m=>m.name).join(", "));
+    list.appendChild(div);
+  });
 }
-function renderAvailable(){
- const div=document.getElementById("availableRecipes"); div.innerHTML="";
- let matchCount=0,total=recipes.length;
- recipes.forEach(r=>{
-   let missing=r.ingredients.filter(i=>!pantry.find(p=>p.name===i));
-   if(missing.length===0) matchCount++;
-   const el=document.createElement("div"); el.className="recipe-card";
-   el.innerHTML=`<div class="${missing.length===0?'available':''}">${r.name}</div>${missing.length>0?`<div class="missing">Missing: ${missing.join(", ")}</div>`:""}`;
-   div.appendChild(el);
- });
- document.getElementById("matchRate").innerText=total?Math.round((matchCount/total)*100)+"%":"0%";
-}
-function renderStats(){
- document.getElementById("ingredientCount").innerText=pantry.length;
- document.getElementById("recipeCount").innerText=recipes.length;
+function updateSidebarRecipes(){
+  const s=document.getElementById("recipesSidebar"); s.innerHTML="";
+  recipes.forEach((r,i)=>{
+    const d=document.createElement("div"); d.className="recipeItem"; d.textContent=r.name;
+    const rem=document.createElement("span"); rem.className="remove"; rem.textContent="✖"; rem.onclick=()=>deleteRecipe(i);
+    d.appendChild(rem); s.appendChild(d);
+  });
 }
 
-// Pantry collapse
-function togglePantry(){document.getElementById("pantryList").classList.toggle("collapsedPantry");}
-
-// Ingredient suggestions
-const ingredientInput=document.getElementById("ingredientInput");
-const suggestionsDiv=document.getElementById("suggestions");
-ingredientInput.addEventListener("input",function(){
- const val=this.value.toLowerCase().trim();
- if(!val){suggestionsDiv.style.display="none"; return;}
- const matches=baseFoods.filter(f=>f.startsWith(val)).slice(0,5);
- suggestionsDiv.innerHTML=matches.map(m=>`<div class="suggestion-item">${m}</div>`).join("");
- suggestionsDiv.style.display=matches.length?"block":"none";
- document.querySelectorAll(".suggestion-item").forEach(item=>{item.onclick=()=>{ingredientInput.value=item.innerText; suggestionsDiv.style.display="none";}});
-});
-document.addEventListener("click",e=>{if(!ingredientInput.contains(e.target)&&!suggestionsDiv.contains(e.target)){suggestionsDiv.style.display="none";}});
-
-// Image recognition
-let model; async function loadModel(){model=await mobilenet.load();} loadModel();
+// --- Image recognition ---
+let model;
+async function loadModel(){ model = await mobilenet.load(); }
+loadModel();
 async function handleImage(event){
- const file=event.target.files[0]; if(!file) return;
- const img=document.createElement("img"); img.src=URL.createObjectURL(file);
- img.onload=async ()=>{
-   const predictions=await model.classify(img); let bestMatch="",bestScore=9999;
-   for(let i=0;i<Math.min(3,predictions.length);i++){
-     let label=predictions[i].className.toLowerCase().split(",")[0].split(" ")[0];
-     for(const food of baseFoods){ let d=levenshtein(label,food); if(d<bestScore){bestScore=d; bestMatch=food;}}
-   }
-   if(bestMatch) document.getElementById("ingredientInput").value=bestMatch;
- }
+  const file = event.target.files[0]; if(!file) return;
+  const img = document.createElement("img"); img.src = URL.createObjectURL(file);
+  img.onload = async ()=>{
+    const predictions = await model.classify(img);
+    if(predictions.length>0){
+      document.getElementById("ingredientInput").value = predictions[0].className.split(",")[0].split(" ")[0];
+    }
+  }
 }
 
 // Init
-renderAll();
+updatePantry(); updatePantrySidebar(); updateRecipes(); updateSidebarRecipes();
 </script>
 </body>
 </html>
