@@ -1,95 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Pantry Pro</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#1e1e1e;
-  --accent:#2e7d32;
-  --border:#e0e0e0;
-}
-
-.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#ffffff;
-  --accent:#4caf50;
-  --border:#333;
-}
-
 body{
-  margin:0;
   font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:.3s;
+  background:#f4f6f8;
+  margin:0;
 }
 
 header{
-  background:var(--accent);
+  background:#2e7d32;
   color:white;
-  padding:16px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:15px;
+  padding:20px;
+  text-align:center;
 }
 
 .container{
   display:flex;
-  min-height:100vh;
 }
 
-/* SIDEBAR */
 .sidebar{
-  width:260px;
-  background:var(--card);
-  border-right:1px solid var(--border);
+  width:240px;
+  background:#ffffff;
   padding:20px;
-  transition:width .3s ease;
-  overflow:hidden;
-}
-
-.sidebar.collapsed{
-  width:70px;
-}
-
-.sidebar.collapsed h3,
-.sidebar.collapsed h4,
-.sidebar.collapsed hr,
-.sidebar.collapsed div{
-  display:none;
+  border-right:1px solid #ddd;
+  height:calc(100vh - 80px);
+  overflow-y:auto;
 }
 
 .main{
   flex:1;
   padding:30px;
-  display:grid;
-  gap:20px;
-  transition:.3s;
 }
 
 .card{
-  background:var(--card);
+  background:white;
   padding:20px;
-  border-radius:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  border-radius:12px;
+  box-shadow:0 6px 15px rgba(0,0,0,0.05);
+  margin-bottom:20px;
 }
 
 button{
-  background:var(--accent);
+  background:#2e7d32;
   color:white;
   border:none;
   padding:8px 14px;
@@ -99,63 +57,41 @@ button{
 }
 
 button:hover{
-  opacity:.9;
+  background:#256628;
 }
 
-input,textarea{
-  width:100%;
+input, textarea{
   padding:8px;
   margin:6px 0;
-  border-radius:8px;
-  border:1px solid var(--border);
-  background:var(--bg);
-  color:var(--text);
+  width:100%;
 }
 
-.recipe-card{
-  border-left:6px solid var(--accent);
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:10px;
-  background:var(--card);
-}
-
-.missing{
-  color:#d32f2f;
-  font-size:0.9rem;
-}
-
-.available{
-  color:var(--accent);
+.corrected{
+  color:#2e7d32;
   font-weight:600;
 }
 
-.toggle-btn{
-  cursor:pointer;
-  font-size:1.2rem;
+.recipe-possible{
+  border-left:6px solid #2e7d32;
+  padding-left:10px;
+  margin-bottom:10px;
 }
 </style>
 </head>
 <body>
 
 <header>
-<div class="header-left">
-<span class="toggle-btn" onclick="toggleSidebar()">☰</span>
-<h2>🥫 Smart Pantry Pro</h2>
-</div>
-
-<div>
-<span style="cursor:pointer" onclick="toggleDark()">🌙 Dark Mode</span>
-</div>
+<h1>🥫 Smart Pantry Pro</h1>
+<p>AI-powered pantry & recipe intelligence</p>
 </header>
 
 <div class="container">
 
-<div id="sidebar" class="sidebar">
+<div class="sidebar">
 <h3>Recipes</h3>
 <div id="recipeList"></div>
 <hr>
-<h4>Corrections</h4>
+<h4>Common Corrections</h4>
 <div id="mistakes"></div>
 </div>
 
@@ -163,9 +99,10 @@ input,textarea{
 
 <div class="card">
 <h3>Add Ingredient</h3>
-<input id="ingredientInput" placeholder="e.g. 2 chopped green onions">
+<input id="ingredientInput" placeholder="e.g. 2 green onions chopped">
 <input id="quantityInput" type="number" placeholder="Quantity">
 <button onclick="addIngredient()">Add</button>
+<div id="correctionNotice"></div>
 </div>
 
 <div class="card">
@@ -182,7 +119,7 @@ input,textarea{
 </div>
 
 <div class="card">
-<h3>Recipe Suggestions</h3>
+<h3>Recipes You Can Make</h3>
 <div id="availableRecipes"></div>
 </div>
 
@@ -191,33 +128,200 @@ input,textarea{
 
 <script>
 
-/* SIDEBAR COLLAPSE */
-if(localStorage.getItem("collapsed")==="true"){
- document.getElementById("sidebar").classList.add("collapsed");
+// ===== BASE FOOD DATABASE (~100+) =====
+const baseFoods = [
+"beef","chicken","pork","fish","shrimp","turkey","sausage","bacon",
+"cheese","milk","butter","cream","yogurt","egg",
+"bread","rice","pasta","flour","sugar","salt","pepper",
+"onion","green onion","garlic","tomato","potato","carrot",
+"broccoli","spinach","lettuce","cabbage","mushroom",
+"zucchini","cucumber","pepper","corn","peas","green beans",
+"asparagus","cauliflower","eggplant","radish","beet",
+"pumpkin","squash","apple","banana","orange","strawberry",
+"blueberry","raspberry","pineapple","mango","grape","pear",
+"lemon","lime","avocado","cilantro","parsley","basil",
+"oregano","thyme","rosemary","cumin","paprika",
+"chili powder","soy sauce","ketchup","mustard","mayonnaise",
+"honey","maple syrup","oats","almond","walnut","peanut",
+"chocolate","vanilla","baking soda","baking powder",
+"lentils","quinoa","barley","tofu","beans",
+"black beans","kidney beans","pinto beans","hazelnut"
+];
+
+// ===== SPELL CORRECTION =====
+function levenshtein(a,b){
+ const matrix=[];
+ for(let i=0;i<=b.length;i++) matrix[i]=[i];
+ for(let j=0;j<=a.length;j++) matrix[0][j]=j;
+ for(let i=1;i<=b.length;i++){
+  for(let j=1;j<=a.length;j++){
+   matrix[i][j]=b.charAt(i-1)===a.charAt(j-1)
+   ?matrix[i-1][j-1]
+   :Math.min(
+     matrix[i-1][j-1]+1,
+     matrix[i][j-1]+1,
+     matrix[i-1][j]+1
+   );
+  }
+ }
+ return matrix[b.length][a.length];
 }
 
-function toggleSidebar(){
- const sb=document.getElementById("sidebar");
- sb.classList.toggle("collapsed");
- localStorage.setItem("collapsed",
-   sb.classList.contains("collapsed"));
+// ===== DATA STORAGE =====
+let pantry=JSON.parse(localStorage.getItem("pantry"))||{};
+let recipes=JSON.parse(localStorage.getItem("recipes"))||[];
+let mistakeLog=JSON.parse(localStorage.getItem("mistakes"))||{};
+
+function save(){
+ localStorage.setItem("pantry",JSON.stringify(pantry));
+ localStorage.setItem("recipes",JSON.stringify(recipes));
+ localStorage.setItem("mistakes",JSON.stringify(mistakeLog));
 }
 
-/* DARK MODE */
-if(localStorage.getItem("dark")==="true"){
- document.body.classList.add("dark");
-}
-function toggleDark(){
- document.body.classList.toggle("dark");
- localStorage.setItem("dark",
-   document.body.classList.contains("dark"));
+// ===== NORMALIZATION ENGINE =====
+function normalizeIngredient(input){
+ let original=input.toLowerCase().trim();
+
+ // remove quantity words & descriptors
+ original=original.replace(/\d+/g,"");
+ original=original.replace(/chopped|sliced|diced|fresh|large|small/g,"").trim();
+
+ // plural handling
+ if(original.endsWith("es")) original=original.slice(0,-2);
+ if(original.endsWith("s")) original=original.slice(0,-1);
+
+ // exact
+ if(baseFoods.includes(original)) return {final:original,changed:false};
+
+ // partial match
+ for(const food of baseFoods){
+   if(original.includes(food)){
+     logMistake(original,food);
+     return {final:food,changed:true};
+   }
+ }
+
+ // fuzzy match
+ let closest=null;
+ let smallest=999;
+ for(const food of baseFoods){
+   let dist=levenshtein(original,food);
+   if(dist<smallest){
+     smallest=dist;
+     closest=food;
+   }
+ }
+
+ if(smallest<=2){
+   logMistake(original,closest);
+   return {final:closest,changed:true};
+ }
+
+ return {final:original,changed:false};
 }
 
-/* --- YOUR EXISTING PANTRY + AI CODE BELOW --- */
-/* Keep your previous AI normalization and render functions here */
-/* (No changes needed there) */
+// ===== MISTAKE TRACKING =====
+function logMistake(from,to){
+ if(from===to) return;
+ if(!mistakeLog[from]) mistakeLog[from]=to;
+}
+
+// ===== ADD INGREDIENT =====
+function addIngredient(){
+ let input=document.getElementById("ingredientInput").value;
+ let qty=parseInt(document.getElementById("quantityInput").value);
+ if(!input||!qty) return;
+
+ let result=normalizeIngredient(input);
+
+ if(result.changed){
+   if(!confirm(`Did you mean "${result.final}" instead of "${input}"?`)){
+     return;
+   }
+ }
+
+ if(pantry[result.final]){
+   pantry[result.final]+=qty;
+ }else{
+   pantry[result.final]=qty;
+ }
+
+ document.getElementById("correctionNotice").innerHTML =
+ result.changed?`Saved as <span class="corrected">${result.final}</span>`:"";
+
+ save();
+ renderAll();
+}
+
+// ===== ADD RECIPE =====
+function addRecipe(){
+ let name=document.getElementById("recipeName").value;
+ let ingredients=document.getElementById("recipeIngredients").value.split(",");
+ let instructions=document.getElementById("recipeInstructions").value;
+
+ ingredients=ingredients.map(i=>normalizeIngredient(i.trim()).final);
+
+ recipes.push({name,ingredients,instructions});
+ save();
+ renderAll();
+}
+
+// ===== RENDERING =====
+function renderAll(){
+ renderPantry();
+ renderRecipes();
+ renderAvailable();
+ renderMistakes();
+}
+
+function renderPantry(){
+ let div=document.getElementById("pantryList");
+ div.innerHTML="";
+ for(const item in pantry){
+   div.innerHTML+=`${item}: ${pantry[item]}<br>`;
+ }
+}
+
+function renderRecipes(){
+ let div=document.getElementById("recipeList");
+ div.innerHTML="";
+ recipes.forEach((r,i)=>{
+   div.innerHTML+=`<div onclick="viewRecipe(${i})">${r.name}</div><hr>`;
+ });
+}
+
+function renderAvailable(){
+ let div=document.getElementById("availableRecipes");
+ div.innerHTML="";
+ recipes.forEach(r=>{
+   let possible=r.ingredients.every(i=>pantry[i]>0);
+   if(possible){
+     div.innerHTML+=`<div class="recipe-possible">${r.name}</div>`;
+   }
+ });
+}
+
+function renderMistakes(){
+ let div=document.getElementById("mistakes");
+ div.innerHTML="";
+ for(const m in mistakeLog){
+   div.innerHTML+=`${m} → ${mistakeLog[m]}<br>`;
+ }
+}
+
+function viewRecipe(i){
+ alert(
+   recipes[i].name+
+   "\n\nIngredients:\n"+
+   recipes[i].ingredients.join(", ")+
+   "\n\nInstructions:\n"+
+   recipes[i].instructions
+ );
+}
+
+renderAll();
 
 </script>
-
 </body>
 </html>
+
