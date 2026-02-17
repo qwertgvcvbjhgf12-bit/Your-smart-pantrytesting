@@ -1,330 +1,288 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Smart Pantry</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Pantry Elite</title>
+<link rel="icon" href="favicon.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    display: flex;
-    height: 100vh;
-    background: #f4f4f9;
-    overflow: hidden;
-  }
+:root{
+--primary:#2d6cdf;
+--danger:#d64545;
+--bg:#f4f6fa;
+--card:#fff;
+--text:#222;
+}
+body.dark{
+--bg:#121212;
+--card:#1e1e1e;
+--text:#eee;
+}
+body{
+margin:0;
+font-family:Segoe UI;
+background:var(--bg);
+color:var(--text);
+transition:.3s;
+}
+.app{display:flex;height:100vh;}
+.sidebar{
+width:240px;
+background:var(--card);
+padding:20px;
+box-shadow:2px 0 15px rgba(0,0,0,.05);
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+.sidebar button{
+padding:8px;
+border:none;
+background:var(--primary);
+color:#fff;
+border-radius:6px;
+cursor:pointer;
+}
+.content{flex:1;padding:30px;overflow:auto;}
+.section{display:none;animation:fade .3s;}
+.section.active{display:block;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
 
-  /* Sidebar */
-  .sidebar {
-    width: 200px;
-    background: #fff;
-    border-right: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    overflow-y: auto;
-  }
+input,textarea{
+width:100%;
+padding:8px;
+margin-bottom:5px;
+border-radius:6px;
+border:1px solid #ccc;
+}
 
-  .sidebar h2 {
-    cursor: pointer;
-    margin: 10px 0;
-    font-size: 16px;
-    display: flex;
-    justify-content: space-between;
-  }
+button.primary{background:var(--primary);color:#fff;}
+button.delete{background:var(--danger);color:#fff;}
 
-  .sidebarContent {
-    margin-left: 5px;
-    margin-bottom: 10px;
-  }
+.card{
+background:var(--card);
+padding:10px;
+border-radius:8px;
+margin-bottom:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
 
-  .collapsed {
-    display: none;
-  }
-
-  /* Main content */
-  .main {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-
-  /* Sections */
-  .section {
-    background: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  .section h2 {
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-    font-size: 16px;
-  }
-
-  .content {
-    margin-top: 10px;
-    display: block;
-    transition: max-height 0.3s ease;
-    overflow: hidden;
-  }
-
-  /* Inputs */
-  input, textarea, button {
-    padding: 8px;
-    margin: 5px 0;
-    width: 95%;
-    box-sizing: border-box;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-
-  button {
-    cursor: pointer;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background: #45a049;
-  }
-
-  /* Ingredients / Recipes */
-  .ingredient, .recipe, .recipeItem {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 5px;
-    margin: 3px 0;
-  }
-
-  .remove {
-    color: red;
-    cursor: pointer;
-    margin-left: 10px;
-  }
-
-  .instructions {
-    margin-left: 20px;
-    font-style: italic;
-    color: #555;
-    display: none;
-  }
-
-  .quantity {
-    font-weight: bold;
-    margin-left: 5px;
-  }
+.category-title{
+margin-top:20px;
+font-weight:bold;
+font-size:18px;
+}
 </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <h2 onclick="toggleSidebarContent('pantrySidebar')">Pantry ▼</h2>
-  <div id="pantrySidebar" class="sidebarContent"></div>
+<div class="app">
+<aside class="sidebar">
+<h2>Smart Pantry</h2>
+<button onclick="showSection('pantry')">Pantry</button>
+<button onclick="showSection('recipes')">Recipes</button>
+<button onclick="showSection('ai')">AI Scanner</button>
+<label><input type="checkbox" id="themeToggle"> Dark Mode</label>
+</aside>
 
-  <h2 onclick="toggleSidebarContent('recipesSidebar')">Recipes ▼</h2>
-  <div id="recipesSidebar" class="sidebarContent"></div>
-</div>
+<main class="content">
 
-<!-- Main content -->
-<div class="main">
-  <h1>Smart Pantry</h1>
+<section id="pantrySection" class="section active">
+<h2>Pantry</h2>
+<input id="pantryInput" placeholder="e.g. chicken 2 lb">
+<button class="primary" onclick="addPantryItem()">Add</button>
+<div id="pantryList"></div>
+</section>
 
-  <div class="section">
-    <h2 onclick="toggleSection('ingredientSection')">Add Ingredient ▼</h2>
-    <div class="content" id="ingredientSection">
-      <input type="text" id="ingredientInput" placeholder="Ingredient name">
-      <input type="text" id="ingredientQty" placeholder="Quantity (e.g., 2 cups, 1 loaf)">
-      <button onclick="addIngredient()">Add</button>
-    </div>
-  </div>
+<section id="recipesSection" class="section">
+<h2>Recipes</h2>
+<input id="recipeName" placeholder="Recipe name">
+<textarea id="recipeIngredients" placeholder="Comma separated ingredients"></textarea>
+<button class="primary" onclick="addRecipe()">Add Recipe</button>
+<div id="recipeList"></div>
+</section>
 
-  <!-- Pantry display in main content -->
-  <div class="section">
-    <h2 onclick="toggleSection('pantrySection')">Pantry ▼</h2>
-    <div class="content" id="pantrySection">
-      <div id="ingredientList"></div>
-    </div>
-  </div>
+<section id="aiSection" class="section">
+<h2>AI Scanner</h2>
+<input type="file" id="imageUpload">
+<div id="aiResult"></div>
+</section>
 
-  <div class="section">
-    <h2 onclick="toggleSection('addRecipeSection')">Add Recipe ▼</h2>
-    <div class="content" id="addRecipeSection">
-      <input type="text" id="recipeName" placeholder="Recipe name">
-      <input type="text" id="recipeIngredients" placeholder="Ingredients (comma-separated, e.g., cheddar:1 cup, milk:2 cups)">
-      <textarea id="recipeInstructions" placeholder="Instructions"></textarea>
-      <button onclick="addRecipe()">Add Recipe</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 onclick="toggleSection('recipeSuggestions')">Recipe Suggestions ▼</h2>
-    <div class="content" id="recipeSuggestions">
-      <div id="recipeList"></div>
-    </div>
-  </div>
+</main>
 </div>
 
 <script>
-// Collapsible sections
-function toggleSection(id){
-  const sec=document.getElementById(id);
-  sec.style.display=(sec.style.display==="none"?"block":"none");
-}
-function toggleSidebarContent(id){
-  const sec=document.getElementById(id);
-  sec.style.display=(sec.style.display==="none"?"block":"none");
+
+/* ---------------------------
+   CATEGORY SYSTEM
+---------------------------- */
+const CATEGORIES={
+Proteins:["chicken","beef","pork","turkey","salmon","tuna","egg","tofu","shrimp"],
+Produce:["onion","garlic","tomato","carrot","broccoli","spinach","lettuce","pepper","mushroom","potato"],
+Dairy:["milk","cheese","butter","yogurt","cream"],
+Grains:["rice","pasta","bread","oats","flour"],
+Spices:["salt","pepper","paprika","cumin","oregano","basil","turmeric"],
+Condiments:["ketchup","mustard","mayonnaise","soy sauce","vinegar"],
+Baking:["sugar","brown sugar","baking powder","cocoa powder"],
+Snacks:["chips","crackers","nuts"]
+};
+
+/* ---------------------------
+   PANTRY DATA
+---------------------------- */
+let pantry=JSON.parse(localStorage.getItem("pantry"))||[];
+let recipes=JSON.parse(localStorage.getItem("recipes"))||[];
+
+/* ---------------------------
+   UTIL
+---------------------------- */
+function showSection(s){
+document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
+document.getElementById(s+"Section").classList.add("active");
 }
 
-// --- Pantry & Recipes ---
-let pantry = JSON.parse(localStorage.getItem('pantry')) || [];
-let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
-
-// --- AI / Spell check ---
-function normalizeIngredient(name){
-  name=name.toLowerCase().trim();
-  const groups={
-    "cheddar":["cheddar","chease","chedar","cheese","sharp cheddar"],
-    "bread":["bread","bred","loaf"],
-    "eggs":["egg","eggs"],
-    "milk":["milk","mylk"],
-    "butter":["butter","buttr"],
-    "pasta":["pasta","spaghetti","macaroni"]
-  };
-  for(const k in groups) if(groups[k].some(a=>name.includes(a))) return k;
-  return name;
+function parseInput(str){
+let parts=str.split(" ");
+let qty=parseFloat(parts.find(p=>!isNaN(p)))||1;
+let unit=parts.find(p=>isNaN(p)&&p.length<=3)||"unit";
+let name=str.replace(qty,"").replace(unit,"").trim();
+return {name:name.toLowerCase(),qty,unit};
 }
 
-// --- Quantities ---
-function parseQuantity(qty){ const m=qty.trim().match(/^(\d+)\s*(.+)$/); return m?{amount:parseInt(m[1]),unit:m[2].toLowerCase()}:{amount:1,unit:qty}; }
-function combineQuantities(o,n){ const p1=parseQuantity(o), p2=parseQuantity(n); return p1.unit===p2.unit?`${p1.amount+p2.amount} ${p1.unit}`:`${o} + ${n}`; }
+/* ---------------------------
+   PANTRY ADD
+---------------------------- */
+function addPantryItem(aiItem){
+let input=aiItem||document.getElementById("pantryInput").value;
+if(!input)return;
 
-// --- Pantry ---
-function addIngredient(){
-  const name=normalizeIngredient(document.getElementById("ingredientInput").value);
-  const qty=document.getElementById("ingredientQty").value.trim()||"1 unit";
-  if(!name) return;
-  const existing=pantry.find(i=>i.name===name);
-  if(existing) existing.qty=combineQuantities(existing.qty,qty);
-  else pantry.push({name,qty});
-  savePantry(); 
-  document.getElementById("ingredientInput").value=""; 
-  document.getElementById("ingredientQty").value="";
-  updatePantry(); 
-  updatePantrySidebar(); 
-  updateRecipes(); 
-  updateSidebarList();
-}
-function removeIngredient(name){ 
-  pantry=pantry.filter(i=>i.name!==name); 
-  savePantry(); 
-  updatePantry(); 
-  updatePantrySidebar(); 
-  updateRecipes(); 
-}
-function updatePantry(){
-  const list=document.getElementById("ingredientList"); 
-  list.innerHTML="";
-  pantry.forEach(item=>{
-    const d=document.createElement("div"); 
-    d.className="ingredient"; 
-    d.innerHTML=`<span>${item.name} <span class="quantity">(${item.qty})</span></span>`; 
-    const r=document.createElement("span"); 
-    r.className="remove"; 
-    r.textContent="✖"; 
-    r.onclick=()=>removeIngredient(item.name); 
-    d.appendChild(r); 
-    list.appendChild(d); 
-  });
-}
-function updatePantrySidebar(){
-  const list=document.getElementById("pantrySidebar"); 
-  list.innerHTML="";
-  pantry.forEach(item=>{
-    const d=document.createElement("div"); 
-    d.className="ingredient"; 
-    d.textContent=`${item.name} (${item.qty})`; 
-    list.appendChild(d);
-  });
+let {name,qty,unit}=parseInput(input);
+
+let existing=pantry.find(p=>p.name===name&&p.unit===unit);
+if(existing){existing.qty+=qty;}
+else{pantry.push({name,qty,unit});}
+
+localStorage.setItem("pantry",JSON.stringify(pantry));
+renderPantry();
+document.getElementById("pantryInput").value="";
 }
 
-// --- Recipes ---
+function deletePantryItem(i){
+pantry.splice(i,1);
+localStorage.setItem("pantry",JSON.stringify(pantry));
+renderPantry();
+}
+
+/* ---------------------------
+   RENDER PANTRY GROUPED
+---------------------------- */
+function renderPantry(){
+const container=document.getElementById("pantryList");
+container.innerHTML="";
+
+Object.keys(CATEGORIES).forEach(cat=>{
+let items=pantry.filter(p=>CATEGORIES[cat].includes(p.name));
+if(items.length){
+container.innerHTML+=`<div class="category-title">${cat}</div>`;
+items.forEach(item=>{
+let index=pantry.indexOf(item);
+container.innerHTML+=`
+<div class="card">
+${item.name} - ${item.qty} ${item.unit}
+<button class="delete" onclick="deletePantryItem(${index})">Delete</button>
+</div>`;
+});
+}
+});
+}
+
+/* ---------------------------
+   RECIPES + MATCHING
+---------------------------- */
 function addRecipe(){
-  const name=document.getElementById("recipeName").value.trim();
-  const ingredientsRaw=document.getElementById("recipeIngredients").value.split(",");
-  const instructions=document.getElementById("recipeInstructions").value.trim();
-  if(!name || ingredientsRaw.length===0) return;
-  const ingredients=ingredientsRaw.map(i=>{let p=i.split(":"); return {name:normalizeIngredient(p[0]), qty:p[1]?p[1].trim():"1 unit"};});
-  recipes.push({name,ingredients,instructions});
-  saveRecipes(); 
-  document.getElementById("recipeName").value=""; 
-  document.getElementById("recipeIngredients").value=""; 
-  document.getElementById("recipeInstructions").value="";
-  updateRecipes(); 
-  updateSidebarList();
-}
-function deleteRecipe(index){ 
-  recipes.splice(index,1); 
-  saveRecipes(); 
-  updateRecipes(); 
-  updateSidebarList();
-}
-function updateRecipes(){
-  const list=document.getElementById("recipeList"); 
-  list.innerHTML="";
-  const sorted=recipes.slice().sort((a,b)=> (b.ingredients.every(i=>pantry.find(p=>p.name===i.name))?1:0)-(a.ingredients.every(i=>pantry.find(p=>p.name===i.name))?1:0));
-  sorted.forEach(recipe=>{
-    const missing=recipe.ingredients.filter(i=>!pantry.find(p=>p.name===i.name)); 
-    const div=document.createElement("div"); 
-    div.className="recipe"; 
-    div.textContent=recipe.name+(missing.length===0?" ✅ You have all ingredients!":" ❌ Missing: "+missing.map(m=>m.name).join(", ")); 
-    const instr=document.createElement("div"); 
-    instr.className="instructions"; 
-    instr.innerHTML=recipe.ingredients.map(i=>`${i.name} (${i.qty})`).join(",")+"<br><br>"+(recipe.instructions||"No instructions added."); 
-    div.onclick=()=>{instr.style.display=instr.style.display==="none"?"block":"none";}; 
-    list.appendChild(div); 
-    list.appendChild(instr);
-  });
-}
-function updateSidebarList(){
-  const s=document.getElementById("recipesSidebar"); 
-  s.innerHTML=""; 
-  recipes.forEach((r,i)=>{
-    const d=document.createElement("div"); 
-    d.className="recipeItem"; 
-    d.textContent=r.name; 
-    const rem=document.createElement("span"); 
-    rem.className="remove"; 
-    rem.textContent="✖"; 
-    rem.onclick=()=>deleteRecipe(i); 
-    d.appendChild(rem); 
-    s.appendChild(d);
-  });
+let name=document.getElementById("recipeName").value;
+let ingredients=document.getElementById("recipeIngredients")
+.value.split(",").map(i=>i.trim().toLowerCase());
+
+recipes.push({name,ingredients});
+localStorage.setItem("recipes",JSON.stringify(recipes));
+renderRecipes();
 }
 
-// Local storage
-function savePantry(){ localStorage.setItem('pantry',JSON.stringify(pantry)); }
-function saveRecipes(){ localStorage.setItem('recipes',JSON.stringify(recipes)); }
+function deleteRecipe(i){
+recipes.splice(i,1);
+localStorage.setItem("recipes",JSON.stringify(recipes));
+renderRecipes();
+}
 
-// Init
-updatePantry(); updatePantrySidebar(); updateRecipes(); updateSidebarList();
+function renderRecipes(){
+const list=document.getElementById("recipeList");
+list.innerHTML="";
+
+recipes.forEach((r,i)=>{
+let pantryNames=pantry.map(p=>p.name);
+let missing=r.ingredients.filter(ing=>!pantryNames.includes(ing));
+let matchPercent=Math.round(((r.ingredients.length-missing.length)/r.ingredients.length)*100);
+
+list.innerHTML+=`
+<div class="card">
+<div>
+<strong>${r.name}</strong><br>
+Match: ${matchPercent}%<br>
+${missing.length?`Missing: ${missing.join(", ")}`:"You have everything!"}
+</div>
+<button class="delete" onclick="deleteRecipe(${i})">Delete</button>
+</div>`;
+});
+}
+
+/* ---------------------------
+   DARK MODE
+---------------------------- */
+document.getElementById("themeToggle")
+.addEventListener("change",()=>document.body.classList.toggle("dark"));
+
+/* ---------------------------
+   AI FILTERED
+---------------------------- */
+let model;
+(async()=>{model=await mobilenet.load();})();
+
+document.getElementById("imageUpload")
+.addEventListener("change",async function(e){
+let file=e.target.files[0];
+if(!file||!model)return;
+let img=document.createElement("img");
+img.src=URL.createObjectURL(file);
+img.onload=async()=>{
+let pred=await model.classify(img);
+let top=pred[0];
+if(top.probability<0.3){
+document.getElementById("aiResult").innerHTML="Low confidence — try again.";
+return;
+}
+let name=top.className.split(",")[0];
+document.getElementById("aiResult").innerHTML=`
+<div class="card">
+Detected: ${name}<br>
+Confidence: ${(top.probability*100).toFixed(1)}%<br>
+<button class="primary" onclick="addPantryItem('${name} 1 unit')">
+Add to Pantry
+</button>
+</div>`;
+};
+});
+
+renderPantry();
+renderRecipes();
 
 </script>
 </body>
 </html>
-
